@@ -343,4 +343,4 @@ class Topic(Surfer):
 
 
     def __repr__(self):
-        return u"<Topic: {} ({})>".format(self.label, self.level).encode("utf-8")
+        return "<Topic: {} ({})>".format(self.label, self.level)
