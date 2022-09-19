@@ -4,7 +4,9 @@ This is a Python module for fetching statistical data about reported crime from 
 
 ### Installation
 
-`pip install -r requirements.txt`
+```
+pip install git+ssh://git@github.com/nickodell/bra_scraper@master
+```
 
 
 ### Usage
@@ -19,7 +21,7 @@ scraper = BRA()
 List topics.
 
 ```python
-print scraper.topics
+print(scraper.topics)
 ```
 
 Explore a topic.
@@ -30,10 +32,10 @@ Explore a topic.
 topic = scraper.topic(u"Månads- och kvartalsvis - Land och län 1975-2014, land och region 2015-")
 
 # Get available regions
-print topic.regions
+print(topic.regions)
 
 # Get available crimes
-print topic.crimes
+print(topic.crimes)
 
 ```
 
@@ -41,7 +43,7 @@ Make query.
 
 ```python
 # Query date range
-data = topic.query(period_start="2016-01-01", period_end="2016-06-30")
+data = topic.query(period_start="2016-01-01", period_end="2016-06-30", period_length="monthly")
 
 # Query by region and crimes
 data = topic.query(regions=["Bjuv kommun"], crimes=[u"Våldsbrott"])
@@ -53,7 +55,7 @@ data = topic.query(regions=["Hela riket"], measures=["count", "per capita"])
 Save results.
 
 ```python
-data.to_csv("my_data_dump.csv")
+data.data.to_csv("my_data_dump.csv")
 ```
 
 ### Command line usage
