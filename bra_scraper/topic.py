@@ -89,7 +89,7 @@ class Topic(Surfer):
         ]
 
     def query(self, regions="*", crimes="*", period_start="1900-01-01",
-            measures=["count"], period_end="2999-1-1",
+            measures=["count"], period_end="2999-1-1", period_length="*",
             ignore_ceased_regions=True, ignore_ceased_crimes=True):
         """ Get the data for a set of region, crime and period ids.
             A date range from 2016-03-01 to 2016-04-01 will include
@@ -100,6 +100,7 @@ class Topic(Surfer):
             :param measurs (str|list): Measures to be included: "count"|"per capita"|"*".
             :param period_start (str|datetime): First timepoint to be included.
             :param period_end (str|datetime): Last timepoint to be included.
+            :param period_length (str): Period type to fetch: "yearly"|"quarterly"|"monthly"|"*".
             :param ignore_ceased_regions (bool): Skip regions that no longer exist
             :param ignore_ceased_crimes (bool): Skip crimes that no longer exist
         """
@@ -107,6 +108,10 @@ class Topic(Surfer):
             period_start = datetime.strptime(period_start, "%Y-%m-%d")
         if isinstance(period_end, str):
             period_end = datetime.strptime(period_end, "%Y-%m-%d")
+        if not isinstance(period_length, str):
+            raise ValueError("period_length must be str")
+        if period_length not in ["yearly", "quarterly", "monthly", "*"]:
+            raise ValueError(f"invalid period_length '{period_length}'")
         if not isinstance(regions, list) and regions != "*":
             regions = [regions]
         if not isinstance(crimes, list) and crimes != "*":
@@ -139,11 +144,10 @@ class Topic(Surfer):
                 not (x.ceased and ignore_ceased_crimes) )
             ]
 
-        # For
-        period_ids = [x.id for x in self.periods
-            if (
+        periods = [x for x in self.periods if
+            (
                 (
-                    # Pick up yearly and quarterly data
+                    # Filter by date
                     # eg. 2016-12-01 will return:
                     # - 2016 (whole year)
                     # - 2016, Q4
@@ -152,7 +156,15 @@ class Topic(Surfer):
                     or
                     x.period_start >= period_start
                 )
-                and x.period_end <= period_end)]
+                and x.period_end <= period_end
+            )]
+
+        period_ids = [x.id for x in periods if
+            (
+                # Filter by aggregation type
+                period_length == "*" or
+                period_length == x.periodicity
+            )]
 
         measure_ids = [x.id for x in self.dimension("measures").categories
             if (
