@@ -328,6 +328,7 @@ class Topic(Surfer):
         for i, note_text in enumerate(note_texts):
             category = categories[i]
             dimension = self._dimension_from_category(category)
+            assert dimension is not None, f"Could not find dimension for category {category}"
 
             note = Note(note_text, category, dimension)
             notes[category] = note
