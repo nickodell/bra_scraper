@@ -53,7 +53,8 @@ class Dimension(Surfer):
             # Hence we check if the end of the label
             # matches. Eg. "Stockholms län"
             n_chars = len(id_or_label)
-            if cat.label[-n_chars:] == id_or_label:
+            label_processed = cat.label.rstrip()[-n_chars:]
+            if label_processed == id_or_label:
                 return cat
 
         # 4) No match
